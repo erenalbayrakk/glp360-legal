@@ -49,73 +49,108 @@
         <p id="login-message" class="meta"></p>
       </section>
 
-      <section id="admin-app" hidden>
-        <section class="hero compact-hero">
-          <span class="eyebrow">Canlı moderasyon</span>
-          <h1>Admin panel</h1>
-          <p class="lead">
-            Şikayetleri incele, post/yorum aksiyonu al ve rapor durumunu
-            güncelle.
-          </p>
-        </section>
+      <section id="admin-app" class="admin-layout" hidden>
+        <aside class="side-nav card" aria-label="Admin menüsü">
+          <button class="side-nav-item active" data-section-target="overview">
+            Özet
+          </button>
+          <button class="side-nav-item" data-section-target="users">
+            Kullanıcılar
+          </button>
+          <button class="side-nav-item" data-section-target="posts">
+            Postlar
+          </button>
+          <button class="side-nav-item" data-section-target="reports">
+            Şikayetler
+          </button>
+        </aside>
 
-        <section class="stats-grid" aria-label="Özet">
-          <article class="stat-card">
-            <span>Kullanıcı</span>
-            <strong id="user-count">-</strong>
-          </article>
-          <article class="stat-card">
-            <span>Post</span>
-            <strong id="post-count">-</strong>
-          </article>
-          <article class="stat-card">
-            <span>Açık rapor</span>
-            <strong id="open-report-count">-</strong>
-          </article>
-        </section>
+        <div class="admin-content">
+          <section class="hero compact-hero admin-section" data-section="overview">
+            <span class="eyebrow">Canlı moderasyon</span>
+            <h1>Admin panel</h1>
+            <p class="lead">
+              Sol menüden kullanıcıları, postları ve şikayetleri yönet.
+            </p>
+          </section>
 
-        <section class="toolbar card">
-          <label>
-            Durum
-            <select id="status-filter">
-              <option value="open">Açık</option>
-              <option value="reviewed">İncelendi</option>
-              <option value="actioned">Aksiyon alındı</option>
-              <option value="dismissed">Reddedildi</option>
-              <option value="all">Tümü</option>
-            </select>
-          </label>
-          <button id="refresh-button" class="primary-button">Yenile</button>
-        </section>
+          <section class="stats-grid admin-section" data-section="overview" aria-label="Özet">
+            <button class="stat-card stat-button" data-section-target="users">
+              <span>Kullanıcı</span>
+              <strong id="user-count">-</strong>
+            </button>
+            <button class="stat-card stat-button" data-section-target="posts">
+              <span>Post</span>
+              <strong id="post-count">-</strong>
+            </button>
+            <button class="stat-card stat-button" data-section-target="reports">
+              <span>Açık rapor</span>
+              <strong id="open-report-count">-</strong>
+            </button>
+          </section>
 
-        <section class="card">
-          <div class="section-title">
-            <div>
-              <h2>Kullanıcılar</h2>
-              <p class="meta">E-posta, ilaç, onboarding ve paylaşım durumu.</p>
+          <section class="card admin-section" data-section="users" hidden>
+            <div class="section-title">
+              <div>
+                <h2>Kullanıcılar</h2>
+                <p class="meta">E-posta, ilaç, onboarding ve paylaşım durumu.</p>
+              </div>
+              <label class="search-label">
+                Ara
+                <input
+                  id="user-search-input"
+                  type="search"
+                  placeholder="İsim veya e-posta"
+                  autocomplete="off"
+                />
+              </label>
             </div>
-            <label class="search-label">
-              Ara
-              <input
-                id="user-search-input"
-                type="search"
-                placeholder="İsim veya e-posta"
-                autocomplete="off"
-              />
+            <div id="users-list" class="users-list"></div>
+          </section>
+
+          <section class="card admin-section" data-section="posts" hidden>
+            <div class="section-title">
+              <div>
+                <h2>Postlar</h2>
+                <p class="meta">Son paylaşımlar ve hızlı moderasyon.</p>
+              </div>
+              <label class="search-label">
+                Ara
+                <input
+                  id="post-search-input"
+                  type="search"
+                  placeholder="İçerik veya kullanıcı"
+                  autocomplete="off"
+                />
+              </label>
+            </div>
+            <div id="posts-list" class="reports-list"></div>
+          </section>
+
+          <section class="toolbar card admin-section" data-section="reports" hidden>
+            <label>
+              Durum
+              <select id="status-filter">
+                <option value="open">Açık</option>
+                <option value="reviewed">İncelendi</option>
+                <option value="actioned">Aksiyon alındı</option>
+                <option value="dismissed">Reddedildi</option>
+                <option value="all">Tümü</option>
+              </select>
             </label>
-          </div>
-          <div id="users-list" class="users-list"></div>
-        </section>
+            <button id="refresh-button" class="primary-button">Yenile</button>
+          </section>
 
-        <section class="card">
-          <div class="section-title">
-            <div>
-              <h2>Şikayetler</h2>
-              <p class="meta">En yeni raporlar üstte görünür.</p>
+          <section class="card admin-section" data-section="reports" hidden>
+            <div class="section-title">
+              <div>
+                <h2>Şikayetler</h2>
+                <p class="meta">En yeni raporlar üstte görünür.</p>
+              </div>
             </div>
-          </div>
-          <div id="reports-list" class="reports-list"></div>
-        </section>
+            <div id="reports-list" class="reports-list"></div>
+          </section>
+        </div>
       </section>
     </main>
   </body>

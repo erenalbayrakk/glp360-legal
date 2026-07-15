@@ -18,12 +18,17 @@ const els = {
   statusFilter: document.querySelector("#status-filter"),
   refresh: document.querySelector("#refresh-button"),
   userSearch: document.querySelector("#user-search-input"),
+  postSearch: document.querySelector("#post-search-input"),
   usersList: document.querySelector("#users-list"),
+  postsList: document.querySelector("#posts-list"),
   reportsList: document.querySelector("#reports-list"),
+  sectionButtons: document.querySelectorAll("[data-section-target]"),
+  sections: document.querySelectorAll("[data-section]"),
 };
 
 let currentUser = null;
 let cachedUsers = [];
+let cachedPosts = [];
 
 function setBusy(button, busy) {
   if (!button) return;
@@ -75,6 +80,10 @@ async function init() {
   els.refresh.addEventListener("click", loadDashboard);
   els.statusFilter.addEventListener("change", loadReports);
   els.userSearch.addEventListener("input", renderUsers);
+  els.postSearch.addEventListener("input", renderPosts);
+  els.sectionButtons.forEach((button) => {
+    button.addEventListener("click", () => showSection(button.dataset.sectionTarget));
+  });
 
   const { data } = await client.auth.getSession();
   currentUser = data.session?.user ?? null;
@@ -147,7 +156,7 @@ async function renderAuthState() {
 }
 
 async function loadDashboard() {
-  await Promise.all([loadStats(), loadUsers(), loadReports()]);
+  await Promise.all([loadStats(), loadUsers(), loadPosts(), loadReports()]);
 }
 
 async function loadStats() {
@@ -218,6 +227,85 @@ function renderUser(user) {
         <span class="badge">${escapeHtml(user.ilac || "İlaç yok")}</span>
         <span class="badge">${escapeHtml(user.cinsiyet || "Cinsiyet yok")}</span>
         <span class="badge">${Number(user.post_count || 0)} post</span>
+      </div>
+    </article>
+  `;
+}
+
+async function loadPosts() {
+  els.postsList.innerHTML = '<div class="empty-state">Postlar yükleniyor...</div>';
+  const { data, error } = await client
+    .from("posts")
+    .select("id, content, created_at, post_type, group_slug, tags, profiles!posts_user_id_fkey(username)")
+    .order("created_at", { ascending: false })
+    .limit(100);
+
+  if (error) {
+    els.postsList.innerHTML = `<div class="empty-state">Postlar alınamadı: ${escapeHtml(
+      error.message,
+    )}</div>`;
+    return;
+  }
+
+  cachedPosts = data || [];
+  renderPosts();
+}
+
+function renderPosts() {
+  const search = els.postSearch.value.trim().toLocaleLowerCase("tr-TR");
+  const posts = cachedPosts.filter((post) => {
+    if (!search) return true;
+    return [
+      post.content,
+      post.profiles?.username,
+      post.post_type,
+      post.group_slug,
+      ...(post.tags || []),
+    ]
+      .filter(Boolean)
+      .some((value) =>
+        String(value).toLocaleLowerCase("tr-TR").includes(search),
+      );
+  });
+
+  if (!posts.length) {
+    els.postsList.innerHTML =
+      '<div class="empty-state">Bu aramada post yok.</div>';
+    return;
+  }
+
+  els.postsList.innerHTML = posts.map(renderPost).join("");
+  els.postsList.querySelectorAll("[data-action]").forEach((button) => {
+    button.addEventListener("click", handleReportAction);
+  });
+}
+
+function renderPost(post) {
+  return `
+    <article class="report-card">
+      <div class="report-top">
+        <div class="badge-row">
+          <span class="badge">${escapeHtml(post.post_type || "post")}</span>
+          <span class="badge">${escapeHtml(post.group_slug || "genel")}</span>
+        </div>
+        <span class="meta">${escapeHtml(formatDate(post.created_at))}</span>
+      </div>
+      <div class="report-body">
+        <strong>${escapeHtml(post.profiles?.username || "Üye")}</strong>
+        <div class="report-content">${escapeHtml(post.content || "Boş içerik")}</div>
+        ${
+          post.tags?.length
+            ? `<p class="meta">Etiketler: ${escapeHtml(post.tags.join(", "))}</p>`
+            : ""
+        }
+      </div>
+      <div class="report-actions">
+        <div class="actions-left"></div>
+        <div class="actions-right">
+          <button class="ghost-button danger-button" data-action="delete-post" data-target-id="${escapeHtml(
+            post.id,
+          )}">Postu sil</button>
+        </div>
       </div>
     </article>
   `;
@@ -370,6 +458,9 @@ async function handleReportAction(event) {
         button.dataset.reportId,
       );
     }
+    if (action === "delete-post") {
+      await deletePost(button.dataset.targetId);
+    }
     await loadDashboard();
   } catch (error) {
     alert(error.message || error);
@@ -396,6 +487,28 @@ async function deleteTarget(targetType, targetId, reportId) {
   const { error } = await client.from(table).delete().eq("id", targetId);
   if (error) throw error;
   await updateReportStatus(reportId, "actioned");
+}
+
+async function deletePost(postId) {
+  if (!window.confirm("Bu post silinsin mi? Bu işlem geri alınamaz.")) {
+    return;
+  }
+
+  const { error } = await client.from("posts").delete().eq("id", postId);
+  if (error) throw error;
+}
+
+function showSection(sectionName) {
+  els.sections.forEach((section) => {
+    section.hidden = section.dataset.section !== sectionName;
+  });
+
+  els.sectionButtons.forEach((button) => {
+    button.classList.toggle(
+      "active",
+      button.dataset.sectionTarget === sectionName,
+    );
+  });
 }
 
 init().catch((error) => {

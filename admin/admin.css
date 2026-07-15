@@ -15,6 +15,44 @@
   margin-bottom: 10px;
 }
 
+.admin-layout {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.admin-content {
+  display: grid;
+  gap: 16px;
+}
+
+.side-nav {
+  position: sticky;
+  top: 18px;
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+}
+
+.side-nav-item {
+  min-height: 48px;
+  border: 0;
+  border-radius: 16px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-weight: 950;
+  text-align: left;
+  padding: 10px 14px;
+}
+
+.side-nav-item:hover,
+.side-nav-item.active {
+  background: var(--soft);
+  color: var(--primary);
+}
+
 button,
 input,
 select,
@@ -74,11 +112,23 @@ textarea {
 }
 
 .stat-card {
+  appearance: none;
   border: 1px solid var(--line);
   border-radius: 24px;
   background: white;
+  color: var(--ink);
   padding: 18px;
   box-shadow: 0 14px 38px rgba(20, 33, 29, 0.06);
+  text-align: left;
+}
+
+.stat-button {
+  cursor: pointer;
+}
+
+.stat-button:hover {
+  border-color: color-mix(in srgb, var(--primary) 55%, var(--line));
+  transform: translateY(-1px);
 }
 
 .stat-card span {
@@ -265,6 +315,19 @@ textarea {
 }
 
 @media (max-width: 760px) {
+  .admin-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .side-nav {
+    position: static;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .side-nav-item {
+    text-align: center;
+  }
+
   .password-login-form,
   .stats-grid {
     grid-template-columns: 1fr;
