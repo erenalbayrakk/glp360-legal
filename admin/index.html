@@ -27,23 +27,25 @@
         <span class="eyebrow">Yönetim paneli</span>
         <h1>Topluluğu güvenli tut.</h1>
         <p class="lead">
-          Raporları görmek ve moderasyon yapmak için admin hesabınla giriş yap.
+          Raporları görmek ve moderasyon yapmak için admin bilgilerinle giriş yap.
         </p>
-        <div class="login-grid">
-          <button id="google-login-button" class="primary-button">
-            Google ile giriş yap
-          </button>
-          <form id="otp-form" class="otp-form">
-            <input
-              id="email-input"
-              type="email"
-              placeholder="Admin e-posta"
-              autocomplete="email"
-              required
-            />
-            <button class="ghost-button" type="submit">Magic link gönder</button>
-          </form>
-        </div>
+        <form id="password-login-form" class="password-login-form">
+          <input
+            id="email-input"
+            type="email"
+            placeholder="Admin e-posta"
+            autocomplete="email"
+            required
+          />
+          <input
+            id="password-input"
+            type="password"
+            placeholder="Şifre"
+            autocomplete="current-password"
+            required
+          />
+          <button class="primary-button" type="submit">Giriş yap</button>
+        </form>
         <p id="login-message" class="meta"></p>
       </section>
 

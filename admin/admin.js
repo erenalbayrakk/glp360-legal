@@ -7,9 +7,9 @@ const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const els = {
   loginCard: document.querySelector("#login-card"),
   adminApp: document.querySelector("#admin-app"),
-  googleLogin: document.querySelector("#google-login-button"),
-  otpForm: document.querySelector("#otp-form"),
+  passwordLoginForm: document.querySelector("#password-login-form"),
   emailInput: document.querySelector("#email-input"),
+  passwordInput: document.querySelector("#password-input"),
   loginMessage: document.querySelector("#login-message"),
   signOut: document.querySelector("#sign-out-button"),
   userCount: document.querySelector("#user-count"),
@@ -67,8 +67,7 @@ function statusLabel(status) {
 }
 
 async function init() {
-  els.googleLogin.addEventListener("click", signInWithGoogle);
-  els.otpForm.addEventListener("submit", sendMagicLink);
+  els.passwordLoginForm.addEventListener("submit", signInWithPassword);
   els.signOut.addEventListener("click", signOut);
   els.refresh.addEventListener("click", loadDashboard);
   els.statusFilter.addEventListener("change", loadReports);
@@ -83,37 +82,27 @@ async function init() {
   });
 }
 
-async function signInWithGoogle() {
-  setBusy(els.googleLogin, true);
-  const { error } = await client.auth.signInWithOAuth({
-    provider: "google",
-    options: {
-      redirectTo: `${window.location.origin}${window.location.pathname}`,
-    },
-  });
-  if (error) {
-    setMessage(`Google girişi başlatılamadı: ${error.message}`);
-    setBusy(els.googleLogin, false);
-  }
-}
-
-async function sendMagicLink(event) {
+async function signInWithPassword(event) {
   event.preventDefault();
-  setBusy(els.otpForm.querySelector("button"), true);
+  const button = els.passwordLoginForm.querySelector("button");
+  setBusy(button, true);
   const email = els.emailInput.value.trim();
-  const { error } = await client.auth.signInWithOtp({
+  const password = els.passwordInput.value;
+
+  const { data, error } = await client.auth.signInWithPassword({
     email,
-    options: {
-      emailRedirectTo: `${window.location.origin}${window.location.pathname}`,
-    },
+    password,
   });
 
-  setBusy(els.otpForm.querySelector("button"), false);
-  setMessage(
-    error
-      ? `Magic link gönderilemedi: ${error.message}`
-      : "Magic link gönderildi. Mailden açınca panel devam edecek.",
-  );
+  setBusy(button, false);
+  if (error) {
+    setMessage(`Giriş başarısız: ${error.message}`);
+    return;
+  }
+
+  currentUser = data.user;
+  els.passwordInput.value = "";
+  await renderAuthState();
 }
 
 async function signOut() {

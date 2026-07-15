@@ -48,17 +48,11 @@ textarea {
   opacity: 0.55;
 }
 
-.login-grid {
+.password-login-form {
   display: grid;
-  grid-template-columns: minmax(220px, 320px) 1fr;
-  gap: 14px;
+  max-width: 460px;
+  gap: 12px;
   margin-top: 28px;
-}
-
-.otp-form {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 10px;
 }
 
 input,
@@ -218,8 +212,7 @@ textarea {
 }
 
 @media (max-width: 760px) {
-  .login-grid,
-  .otp-form,
+  .password-login-form,
   .stats-grid {
     grid-template-columns: 1fr;
   }
