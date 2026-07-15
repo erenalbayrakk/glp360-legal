@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>GLP360 Admin</title>
+    <meta name="robots" content="noindex,nofollow" />
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="./admin.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script defer src="./admin.js"></script>
+  </head>
+  <body>
+    <main class="shell admin-shell">
+      <nav class="nav">
+        <a class="brand" href="../index.html">
+          <span class="mark">+</span>
+          <span>GLP360 Admin</span>
+        </a>
+        <div class="links">
+          <a href="../index.html">Site</a>
+          <button id="sign-out-button" class="ghost-button" hidden>Çıkış</button>
+        </div>
+      </nav>
+
+      <section id="login-card" class="hero admin-login">
+        <span class="eyebrow">Yönetim paneli</span>
+        <h1>Topluluğu güvenli tut.</h1>
+        <p class="lead">
+          Raporları görmek ve moderasyon yapmak için admin hesabınla giriş yap.
+        </p>
+        <div class="login-grid">
+          <button id="google-login-button" class="primary-button">
+            Google ile giriş yap
+          </button>
+          <form id="otp-form" class="otp-form">
+            <input
+              id="email-input"
+              type="email"
+              placeholder="Admin e-posta"
+              autocomplete="email"
+              required
+            />
+            <button class="ghost-button" type="submit">Magic link gönder</button>
+          </form>
+        </div>
+        <p id="login-message" class="meta"></p>
+      </section>
+
+      <section id="admin-app" hidden>
+        <section class="hero compact-hero">
+          <span class="eyebrow">Canlı moderasyon</span>
+          <h1>Admin panel</h1>
+          <p class="lead">
+            Şikayetleri incele, post/yorum aksiyonu al ve rapor durumunu
+            güncelle.
+          </p>
+        </section>
+
+        <section class="stats-grid" aria-label="Özet">
+          <article class="stat-card">
+            <span>Kullanıcı</span>
+            <strong id="user-count">-</strong>
+          </article>
+          <article class="stat-card">
+            <span>Post</span>
+            <strong id="post-count">-</strong>
+          </article>
+          <article class="stat-card">
+            <span>Açık rapor</span>
+            <strong id="open-report-count">-</strong>
+          </article>
+        </section>
+
+        <section class="toolbar card">
+          <label>
+            Durum
+            <select id="status-filter">
+              <option value="open">Açık</option>
+              <option value="reviewed">İncelendi</option>
+              <option value="actioned">Aksiyon alındı</option>
+              <option value="dismissed">Reddedildi</option>
+              <option value="all">Tümü</option>
+            </select>
+          </label>
+          <button id="refresh-button" class="primary-button">Yenile</button>
+        </section>
+
+        <section class="card">
+          <div class="section-title">
+            <div>
+              <h2>Şikayetler</h2>
+              <p class="meta">En yeni raporlar üstte görünür.</p>
+            </div>
+          </div>
+          <div id="reports-list" class="reports-list"></div>
+        </section>
+      </section>
+    </main>
+  </body>
+</html>
