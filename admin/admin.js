@@ -17,10 +17,13 @@ const els = {
   openReportCount: document.querySelector("#open-report-count"),
   statusFilter: document.querySelector("#status-filter"),
   refresh: document.querySelector("#refresh-button"),
+  userSearch: document.querySelector("#user-search-input"),
+  usersList: document.querySelector("#users-list"),
   reportsList: document.querySelector("#reports-list"),
 };
 
 let currentUser = null;
+let cachedUsers = [];
 
 function setBusy(button, busy) {
   if (!button) return;
@@ -71,6 +74,7 @@ async function init() {
   els.signOut.addEventListener("click", signOut);
   els.refresh.addEventListener("click", loadDashboard);
   els.statusFilter.addEventListener("change", loadReports);
+  els.userSearch.addEventListener("input", renderUsers);
 
   const { data } = await client.auth.getSession();
   currentUser = data.session?.user ?? null;
@@ -143,7 +147,7 @@ async function renderAuthState() {
 }
 
 async function loadDashboard() {
-  await Promise.all([loadStats(), loadReports()]);
+  await Promise.all([loadStats(), loadUsers(), loadReports()]);
 }
 
 async function loadStats() {
@@ -159,6 +163,64 @@ async function loadStats() {
   els.userCount.textContent = users.count ?? "-";
   els.postCount.textContent = posts.count ?? "-";
   els.openReportCount.textContent = openReports.count ?? "-";
+}
+
+async function loadUsers() {
+  els.usersList.innerHTML = '<div class="empty-state">Kullanıcılar yükleniyor...</div>';
+  const { data, error } = await client.rpc("admin_users");
+  if (error) {
+    els.usersList.innerHTML = `<div class="empty-state">Kullanıcılar alınamadı: ${escapeHtml(
+      error.message,
+    )}</div>`;
+    return;
+  }
+
+  cachedUsers = data || [];
+  renderUsers();
+}
+
+function renderUsers() {
+  const search = els.userSearch.value.trim().toLocaleLowerCase("tr-TR");
+  const users = cachedUsers.filter((user) => {
+    if (!search) return true;
+    return [user.email, user.username, user.ilac, user.cinsiyet]
+      .filter(Boolean)
+      .some((value) =>
+        String(value).toLocaleLowerCase("tr-TR").includes(search),
+      );
+  });
+
+  if (!users.length) {
+    els.usersList.innerHTML =
+      '<div class="empty-state">Bu aramada kullanıcı yok.</div>';
+    return;
+  }
+
+  els.usersList.innerHTML = users.map(renderUser).join("");
+}
+
+function renderUser(user) {
+  return `
+    <article class="user-row">
+      <div class="user-avatar">${escapeHtml(
+        (user.username || user.email || "?").trim().charAt(0).toUpperCase(),
+      )}</div>
+      <div class="user-main">
+        <strong>${escapeHtml(user.username || "İsimsiz kullanıcı")}</strong>
+        <span>${escapeHtml(user.email || "E-posta yok")}</span>
+        <span class="meta">Kayıt: ${escapeHtml(formatDate(user.created_at))}</span>
+      </div>
+      <div class="user-badges">
+        ${user.is_admin ? '<span class="badge danger">Admin</span>' : ""}
+        <span class="badge ${user.onboarding_completed ? "" : "warning"}">
+          ${user.onboarding_completed ? "Onboarding tamam" : "Onboarding eksik"}
+        </span>
+        <span class="badge">${escapeHtml(user.ilac || "İlaç yok")}</span>
+        <span class="badge">${escapeHtml(user.cinsiyet || "Cinsiyet yok")}</span>
+        <span class="badge">${Number(user.post_count || 0)} post</span>
+      </div>
+    </article>
+  `;
 }
 
 async function loadReports() {

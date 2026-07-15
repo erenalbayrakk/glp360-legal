@@ -121,6 +121,59 @@ textarea {
   margin-top: 0;
 }
 
+.search-label {
+  display: grid;
+  min-width: min(100%, 280px);
+  gap: 6px;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.users-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.user-row {
+  display: grid;
+  grid-template-columns: auto minmax(160px, 1fr) minmax(220px, auto);
+  align-items: center;
+  gap: 14px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: #fbfaf5;
+  padding: 14px;
+}
+
+.user-avatar {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  border-radius: 16px;
+  background: var(--soft);
+  color: var(--primary);
+  font-size: 20px;
+  font-weight: 950;
+}
+
+.user-main {
+  display: grid;
+  gap: 2px;
+}
+
+.user-main span {
+  color: var(--muted);
+}
+
+.user-badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
 .reports-list {
   display: grid;
   gap: 14px;
@@ -218,9 +271,19 @@ textarea {
   }
 
   .toolbar,
+  .section-title,
   .report-top,
   .report-actions {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .user-row {
+    grid-template-columns: auto 1fr;
+  }
+
+  .user-badges {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
   }
 }
